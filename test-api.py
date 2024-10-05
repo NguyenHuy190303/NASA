@@ -1,39 +1,45 @@
-import time
+import os
+import pandas as pd
+import sys
 from openai import OpenAI
+from dotenv import load_dotenv
 
-# Enter your Assistant ID here.
-ASSISTANT_ID = "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"
+# Load environment variables from .env file
+load_dotenv()
 
-# Make sure your API key is set as an environment variable.
-client = OpenAI()
+# Get the API key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
+# Set the default encoding to utf-8 for printing
+sys.stdout.reconfigure(encoding='utf-8')
 
-# Create a thread with a message.
-thread = client.beta.threads.create(
-    messages=[
-        {
-            "role": "user",
-            # Update this with the query you want to use.
-            "content": "What's the most livable city in the world?",
-        }
-    ]
-)
+def generate_gpt_analysis(country_name, experiment, country_data, user_question):
+    # Prepare the data context
+    data_context = country_data.head(10).to_string(index=False)
+    
+    # Create the prompt
+    prompt = f"""
+    You are a data scientist and climate change expert. The data below shows CO₂ emissions for {country_name}, 
+    especially focusing on the following components: Fossil Fuels, Rivers, Wood+Crops, ΔC_loss, and NCE.
 
-# Submit the thread to the assistant (as a new run).
-run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
-print(f"👉 Run Created: {run.id}")
+    {data_context}
 
-# Wait for run to complete.
-while run.status != "completed":
-    run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-    print(f"🏃 Run Status: {run.status}")
-    time.sleep(1)
-else:
-    print(f"🏁 Run Completed!")
+    Based on this data, please answer the following question in detail:
+    {user_question}
+    """
 
-# Get the latest message from the thread.
-message_response = client.beta.threads.messages.list(thread_id=thread.id)
-messages = message_response.data
+    # Make the API request using the latest OpenAI API client
+    response = client.chat.completions.create(
+        model="gpt-4o",  # You can replace this with "gpt-4o-mini" if needed
+        messages=[
+            {"role": "system", "content": "You are a climate data expert."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    return response.choices[0].message.content
 
-# Print the latest message.
-latest_message = messages[0]
-print(f"💬 Response: {latest_message.content[0].text.value}")
+# Load the data
+india_data = pd.read_csv("./pilot_topdown_CO2_Budget_countries_v1.csv")
+print(generate_gpt_analysis("India", "CO2 Emissions", india_data, "What are the main sources of CO2 emissions in India?"))

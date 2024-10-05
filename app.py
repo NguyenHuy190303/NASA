@@ -3,20 +3,22 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Set OpenAI API key
-openai.api_key = os.getenv('OPENAI_API_KEY')
+# Get the API key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
 
 # Load and cache the data for faster access
 @st.cache_data
 def load_data():
-    url ='https://ceos.org/gst/files/pilot_topdown_CO2_Budget_countries_v1.csv'
+    url = 'https://ceos.org/gst/files/pilot_topdown_CO2_Budget_countries_v1.csv'
     df_all = pd.read_csv(url, skiprows=52)
     return df_all
 
@@ -59,18 +61,19 @@ country_data['Year'] = pd.to_numeric(country_data['Year'], errors='coerce')
 country_data = country_data.dropna(subset=['Year'])
 
 # Enhanced ΔC_loss chart using Seaborn
-st.header(f'Enhanced $\Delta C_{{loss}}$ Visualization for {country_name}')
+st.header(f'Enhanced ΔC_loss Visualization for {country_name}')
 
 if country_data.empty:
     st.error('No data available for the selected country and experiment.')
 else:
     # Enhanced ΔC_loss visualization
     plt.figure(figsize=(10, 6))
-    sns.regplot(data=country_data, x='Year', y=experiment+' dC_loss (TgCO2)', marker='o', scatter_kws={"s": 50}, line_kws={"color": "red"})
+    sns.regplot(data=country_data, x='Year', y=experiment+' dC_loss (TgCO2)', marker='o',
+                scatter_kws={"s": 50}, line_kws={"color": "red"})
     plt.axhline(0, color='black', linestyle='--')
-    plt.title(f'$\Delta C_{{loss}}$ over the years for {country_name}', fontsize=16)
+    plt.title(f'ΔC_loss over the years for {country_name}', fontsize=16)
     plt.xlabel('Year', fontsize=12)
-    plt.ylabel(f'$\Delta C_{{loss}}$ (TgCO₂)', fontsize=12)
+    plt.ylabel(f'ΔC_loss (TgCO₂)', fontsize=12)
     plt.grid(True)
     st.pyplot(plt)
 
@@ -88,7 +91,8 @@ else:
     country_data_mean = country_data[country_data['Year'] == int(year)].iloc[0]
 
 # Prepare data for carbon budget visualization
-components = ['FF (TgCO2)', 'Rivers (TgCO2)', 'Wood+Crop (TgCO2)', experiment+' dC_loss (TgCO2)', experiment+' NCE (TgCO2)']
+components = ['FF (TgCO2)', 'Rivers (TgCO2)', 'Wood+Crop (TgCO2)',
+              experiment+' dC_loss (TgCO2)', experiment+' NCE (TgCO2)']
 labels = ['Fossil Fuels', 'Rivers', 'Wood + Crops', 'ΔC_loss', 'NCE']
 values = [country_data_mean[comp] for comp in components]
 
@@ -109,12 +113,6 @@ st.header(f'GPT Analysis for {country_name}')
 # User inputs a question for GPT analysis
 user_question = st.text_input('Ask a question about the data or chart:')
 
-import os
-from openai import OpenAI
-
-# Initialize the OpenAI client
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
 def generate_gpt_analysis(country_name, experiment, country_data, user_question):
     # Prepare the data context
     data_context = country_data.head(10).to_string(index=False)
@@ -132,16 +130,14 @@ def generate_gpt_analysis(country_name, experiment, country_data, user_question)
 
     # Make the API request using the latest OpenAI API client
     response = client.chat.completions.create(
-        model="gpt-4o",  # You can replace this with "gpt-3.5-turbo" if needed
+        model="gpt-4o",  # You can replace this with "gpt-4o-mini" if needed
         messages=[
             {"role": "system", "content": "You are a climate data expert."},
             {"role": "user", "content": prompt}
         ]
     )
     
-    return response.choices[0].message.content
-
-
+    return response['choices'][0]['message']['content']
 
 if user_question:
     with st.spinner('Processing your question...'):
