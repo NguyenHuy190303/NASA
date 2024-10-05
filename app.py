@@ -1,10 +1,11 @@
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from openai import OpenAI
-import os
+import sys
+from openai import OpenAI  # Import OpenAI class
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -12,8 +13,13 @@ load_dotenv()
 
 # Get the API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
+
 # Initialize the OpenAI client
 client = OpenAI(api_key=api_key)
+
+# Set the default encoding to utf-8 for printing (for systems supporting it)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # Load and cache the data for faster access
 @st.cache_data
@@ -128,19 +134,23 @@ def generate_gpt_analysis(country_name, experiment, country_data, user_question)
     {user_question}
     """
 
-    # Make the API request using the latest OpenAI API client
+    # Make the API request using the OpenAI client
     response = client.chat.completions.create(
-        model="gpt-4o",  # You can replace this with "gpt-4o-mini" if needed
+        model="gpt-4o-mini",  # Replace with "gpt-4o-mini" if needed
         messages=[
             {"role": "system", "content": "You are a climate data expert."},
             {"role": "user", "content": prompt}
         ]
     )
     
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
+# Process GPT response if user asks a question
 if user_question:
     with st.spinner('Processing your question...'):
-        analysis = generate_gpt_analysis(country_name, experiment, country_data, user_question)
-        st.subheader('Analysis Result')
-        st.write(analysis)
+        try:
+            analysis = generate_gpt_analysis(country_name, experiment, country_data, user_question)
+            st.subheader('Analysis Result')
+            st.write(analysis)
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
