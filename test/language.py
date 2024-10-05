@@ -1,5 +1,3 @@
-# language.py
-
 languages = {
     'en': 'English',
     'vi': 'Tiếng Việt',
@@ -31,6 +29,11 @@ text = {
         'select_dataset': 'Select Dataset',
         'dataset_not_available': 'This dataset is not available yet.',
         'CO2_Budget_countries': 'CO2 Budget Countries',
+        'learn_more': 'Learn more',
+        'explore_co2': 'Explore carbon dioxide levels over the last 50 years',
+        'methane_impact': 'How does methane impact global warming compared to CO²?',
+        'explore_data': 'Would you like to explore data on CO² emissions or methane today?',
+        'fetch_data': 'Fetch Data'
     },
     'vi': {
         'select_experiment': 'Chọn Thí nghiệm',
@@ -55,6 +58,11 @@ text = {
         'select_dataset': 'Chọn Bộ Dữ Liệu',
         'dataset_not_available': 'Bộ dữ liệu này chưa có sẵn.',
         'CO2_Budget_countries': 'Ngân sách CO2 các Quốc gia',
+        'learn_more': 'Tìm hiểu thêm',
+        'explore_co2': 'Khám phá mức độ carbon dioxide trong 50 năm qua',
+        'methane_impact': 'Khí metan ảnh hưởng đến sự nóng lên toàn cầu so với CO² như thế nào?',
+        'explore_data': 'Bạn có muốn khám phá dữ liệu về phát thải CO² hoặc metan hôm nay không?',
+        'fetch_data': 'Lấy dữ liệu'
     },
     'fi': {
         'select_experiment': 'Valitse koe',
@@ -79,6 +87,11 @@ text = {
         'select_dataset': 'Valitse tietojoukko',
         'dataset_not_available': 'Tämä tietojoukko ei ole vielä saatavilla.',
         'CO2_Budget_countries': 'CO2-budjetti maittain',
+        'learn_more': 'Lue lisää',
+        'explore_co2': 'Tutki hiilidioksiditasoja viimeisten 50 vuoden ajalta',
+        'methane_impact': 'Miten metaani vaikuttaa ilmaston lämpenemiseen verrattuna CO²:een?',
+        'explore_data': 'Haluatko tutkia tietoja CO²-päästöistä tai metaanista tänään?',
+        'fetch_data': 'Hae tiedot'
     },
     'sv': {
         'select_experiment': 'Välj experiment',
@@ -103,6 +116,11 @@ text = {
         'select_dataset': 'Välj dataset',
         'dataset_not_available': 'Detta dataset är inte tillgängligt ännu.',
         'CO2_Budget_countries': 'CO2-budget per land',
+        'learn_more': 'Läs mer',
+        'explore_co2': 'Utforska koldioxidnivåer under de senaste 50 åren',
+        'methane_impact': 'Hur påverkar metan den globala uppvärmningen jämfört med CO²?',
+        'explore_data': 'Vill du utforska data om CO²-utsläpp eller metan idag?',
+        'fetch_data': 'Hämta data'
     }
 }
 
