@@ -1,156 +1,75 @@
 import os
 import streamlit as st
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 import sys
-from openai import OpenAI  # Import OpenAI class
-from dotenv import load_dotenv
+import importlib.util
 
-# Load environment variables from .env file
-load_dotenv()
+# Set the correct paths for the files
+visual_path = r'D:\Projects\NASA\visual'
+sys.path.append(visual_path)
 
-# Get the API key from environment variable
-api_key = os.getenv("OPENAI_API_KEY")
+# Dynamically load the co2-in-the-air module
+spec_co2_air = importlib.util.spec_from_file_location("co2_in_the_air", os.path.join(visual_path, 'co2-in-the-air.py'))
+co2_in_the_air = importlib.util.module_from_spec(spec_co2_air)
+spec_co2_air.loader.exec_module(co2_in_the_air)
 
-# Initialize the OpenAI client
-client = OpenAI(api_key=api_key)
+# Dynamically load the space-co2-budget module
+spec_space = importlib.util.spec_from_file_location("space_co2_budget", os.path.join(visual_path, 'space-co2-budget.py'))
+space_co2_budget = importlib.util.module_from_spec(spec_space)
+spec_space.loader.exec_module(space_co2_budget)
 
 # Set the default encoding to utf-8 for printing (for systems supporting it)
 if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding='utf-8')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception as e:
+        st.error(f"Error setting stdout encoding: {e}")
 
-# Load and cache the data for faster access
-@st.cache_data
-def load_data():
-    url = 'https://ceos.org/gst/files/pilot_topdown_CO2_Budget_countries_v1.csv'
-    df_all = pd.read_csv(url, skiprows=52)
-    return df_all
+# Experiment list with full names for better understanding
+experiment_full_names = {
+    'IS': 'International Standard',
+    'LNLG': 'Land and Natural Gas',
+    'LNLGIS': 'Land, Natural Gas, and International Standard',
+    'LNLGOGIS': 'Land, Natural Gas, Oil, Gas, and International Standard'
+}
 
-df_all = load_data()
+# Sidebar allows the user to select the experiment using full names
+experiment_choice = st.sidebar.selectbox('Select Experiment', list(experiment_full_names.values()))
 
-# Experiment list
-experiments = ['IS', 'LNLG', 'LNLGIS', 'LNLGOGIS']
+# Function to get the original abbreviation based on the user selection
+def get_experiment_abbreviation(choice):
+    for abbr, full_name in experiment_full_names.items():
+        if full_name == choice:
+            return abbr
+    return None
 
-# Allow user to select an experiment
-experiment = st.sidebar.selectbox('Select Experiment', experiments)
+# Get the abbreviation for selected experiment
+experiment = get_experiment_abbreviation(experiment_choice)
 
-# Function to process the data based on selected experiment
-def select_experiment(df_all, experiment):
-    if experiment == 'IS':
-        df = df_all.drop(df_all.columns[[4,5,6,7,8,9,12,13,14,15,16,17,20,21,22,23,24,25,34,35,36]], axis=1)
-    elif experiment == 'LNLG':
-        df = df_all.drop(df_all.columns[[2,3,6,7,8,9,10,11,14,15,16,17,18,19,22,23,24,25,33,35,36]], axis=1)
-    elif experiment == 'LNLGIS':
-        df = df_all.drop(df_all.columns[[2,3,4,5,8,9,10,11,12,13,16,17,18,19,20,21,24,25,33,34,36]], axis=1)
-    elif experiment == 'LNLGOGIS':
-        df = df_all.drop(df_all.columns[[2,3,4,5,6,7,10,11,12,13,14,15,18,19,20,21,22,23,33,34,35]], axis=1)
-    return df
+# Database list (new section)
+database_list = [
+    "CO₂ in the Air",
+    "Space CO₂ Budget",
+    "Fossil Fuel CO₂ Tracker",
+    "Land Carbon Flow",
+    "CO₂ Between Air and Ocean"
+]
 
-df = select_experiment(df_all, experiment)
+# Sidebar allows the user to select the database
+selected_database = st.sidebar.selectbox('Select Database', database_list)
 
-# Country list
-countries = df['Alpha 3 Code'].unique()
-countries.sort()
+# Show the charts based on the selected database
+if selected_database == "CO₂ in the Air":
+    # Check if the required functions exist in the module
+    if hasattr(co2_in_the_air, 'plot_co2_growth_rate') and hasattr(co2_in_the_air, 'plot_co2_vs_temperature') and hasattr(co2_in_the_air, 'plot_co2_by_region'):
+        co2_in_the_air.plot_co2_growth_rate()
+        co2_in_the_air.plot_co2_vs_temperature()
+        co2_in_the_air.plot_co2_by_region()
+    else:
+        st.error("The 'co2_in_the_air' module does not have the required visualization functions.")
 
-# Allow user to select a country
-country_name = st.sidebar.selectbox('Select Country', countries)
-
-# Filter data by selected country
-country_data = df[df['Alpha 3 Code'] == country_name]
-
-# Ensure the 'Year' column is numeric
-country_data['Year'] = pd.to_numeric(country_data['Year'], errors='coerce')
-
-# Drop rows with missing or non-numeric years
-country_data = country_data.dropna(subset=['Year'])
-
-# Enhanced ΔC_loss chart using Seaborn
-st.header(f'Enhanced ΔC_loss Visualization for {country_name}')
-
-if country_data.empty:
-    st.error('No data available for the selected country and experiment.')
-else:
-    # Enhanced ΔC_loss visualization
-    plt.figure(figsize=(10, 6))
-    sns.regplot(data=country_data, x='Year', y=experiment+' dC_loss (TgCO2)', marker='o',
-                scatter_kws={"s": 50}, line_kws={"color": "red"})
-    plt.axhline(0, color='black', linestyle='--')
-    plt.title(f'ΔC_loss over the years for {country_name}', fontsize=16)
-    plt.xlabel('Year', fontsize=12)
-    plt.ylabel(f'ΔC_loss (TgCO₂)', fontsize=12)
-    plt.grid(True)
-    st.pyplot(plt)
-
-# Enhanced Carbon Budget visualization using Seaborn
-st.header(f'Enhanced Carbon Budget for {country_name}')
-
-# Select year
-years = country_data['Year'].unique().astype(int)  # Convert years to integers
-year_options = np.append('mean', years.astype(str))  # Fix mixed type error
-year = st.selectbox('Select Year', year_options)
-
-if year == 'mean':
-    country_data_mean = country_data.mean(numeric_only=True)
-else:
-    country_data_mean = country_data[country_data['Year'] == int(year)].iloc[0]
-
-# Prepare data for carbon budget visualization
-components = ['FF (TgCO2)', 'Rivers (TgCO2)', 'Wood+Crop (TgCO2)',
-              experiment+' dC_loss (TgCO2)', experiment+' NCE (TgCO2)']
-labels = ['Fossil Fuels', 'Rivers', 'Wood + Crops', 'ΔC_loss', 'NCE']
-values = [country_data_mean[comp] for comp in components]
-
-# Create a DataFrame for visualization
-budget_df = pd.DataFrame({'Component': labels, 'Value': values})
-
-# Enhanced Carbon Budget visualization with different color palette
-plt.figure(figsize=(8, 6))
-sns.barplot(x='Component', y='Value', data=budget_df, palette='coolwarm')
-plt.title(f'Carbon Budget for {country_name} in {year}', fontsize=16)
-plt.ylabel('CO₂ Emissions (TgCO₂)', fontsize=12)
-plt.grid(True)
-st.pyplot(plt)
-
-# GPT Analysis Section
-st.header(f'GPT Analysis for {country_name}')
-
-# User inputs a question for GPT analysis
-user_question = st.text_input('Ask a question about the data or chart:')
-
-def generate_gpt_analysis(country_name, experiment, country_data, user_question):
-    # Prepare the data context
-    data_context = country_data.head(10).to_string(index=False)
-    
-    # Create the prompt
-    prompt = f"""
-    You are a data scientist and climate change expert. The data below shows CO₂ emissions for {country_name}, 
-    especially focusing on the following components: Fossil Fuels, Rivers, Wood+Crops, ΔC_loss, and NCE.
-
-    {data_context}
-
-    Based on this data, please answer the following question in detail:
-    {user_question}
-    """
-
-    # Make the API request using the OpenAI client
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",  # Replace with "gpt-4o-mini" if needed
-        messages=[
-            {"role": "system", "content": "You are a climate data expert."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    
-    return response.choices[0].message.content
-
-# Process GPT response if user asks a question
-if user_question:
-    with st.spinner('Processing your question...'):
-        try:
-            analysis = generate_gpt_analysis(country_name, experiment, country_data, user_question)
-            st.subheader('Analysis Result')
-            st.write(analysis)
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+elif selected_database == "Space CO₂ Budget":
+    # Call the visualization function from space-co2-budget module
+    if hasattr(space_co2_budget, 'visualize_fossil_fuel_co2_tracker'):
+        space_co2_budget.visualize_fossil_fuel_co2_tracker(experiment)
+    else:
+        st.error("The 'space_co2_budget' module does not have the required visualization function.")
