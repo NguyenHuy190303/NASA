@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top-down CO₂ Budget Dataset (2015-2020)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Instrument Serif", sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .main-content {
+            flex: 2;
+            margin-right: 20px;
+        }
+
+        .sidebar {
+            flex: 0.5;
+            background: #ddd;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+
+        .article {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .article img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .article h2 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .article p {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .sidebar h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Top-down CO₂ Budget Dataset (2015-2020)</h1>
+</header>
+
+<div class="container">
+    <div class="main-content">
+        <div class="article">
+            <h2>Dataset Overview</h2>
+            <p><strong>Temporal Extent:</strong> 2015 – 2020</p>
+            <p><strong>Temporal Resolution:</strong> Annual</p>
+            <p><strong>Spatial Extent:</strong> Global</p>
+            <p><strong>Spatial Resolution:</strong> 1° x 1°</p>
+            <p><strong>Data Units:</strong> Grams of carbon dioxide per square meter per year (g CO₂/m²/yr)</p>
+            <p><strong>Data Type:</strong> Research</p>
+            <p><strong>Data Latency:</strong> N/A</p>
+            <p>
+                Inverse modeling (“top-down”) is used to estimate annual net carbon dioxide (CO₂) emissions and removals in units of grams of CO₂ per square meter per year (g CO₂/m²/yr). This project, part of the Orbiting Carbon Observatory (OCO-2) modeling intercomparison project (MIP), represents a collaboration between over 60 researchers worldwide.
+            </p>
+            <p>
+                The dataset includes annual net fluxes of CO₂ across a global 1-degree grid for the six-year period (2015-2020). It accounts for net carbon exchange (NCE), fossil fuel emissions (FF), and lateral fluxes due to crop trade, wood trade, and river export. The emission variables and their uncertainties are displayed, including net biosphere exchange (NBE), net carbon exchange (NCE), fossil fuel and cement emissions, and more.
+            </p>
+            <h2>Significance of the Data</h2>
+            <img src="https://cdn.pixabay.com/photo/2019/12/18/04/27/environmental-protection-4700579_960_720.jpg" alt="CO₂ emissions and global impact">
+            <p>
+                Accurate accounting of net carbon exchange (NCE) is critical for supporting global initiatives such as the Paris Agreement. This dataset is intended to inform countries’ carbon budgets and aid the Global Stocktake process.
+            </p>
+        </div>
+
+        <div class="article">
+            <h2>Source Data Product Citation</h2>
+            <p>
+                Byrne, B., Baker, D. F., Basu, S., Bertolacci, M., Bowman, K. W., Carroll, D., Chatterjee, A., Chevallier, F., Ciais, P., Cressie, N., Crisp, D., Crowell, S., Deng, F., Deng, Z., Deutscher, N. M., Dubey, M. K., Feng, S., García, O. E., Herkommer, B., Hu, L., Jacobson, A. R., Janardanan, R., Jeong, S., Johnson, M. S., Jones, D. B. A., Kivi, R., Liu, J., Liu, Z., Maksyutov, S., Miller, J. B., Miller, S. M., Morino, I., Notholt, J., Oda, T., O’Dell, C. W., Oh, Y.-S., Ohyama, H., Patra, P. K., Peiro, H., Petri, C., Philip, S., Pollard, D. F., Poulter, B., Remaud, M., Schuh, A., Sha, M. K., Shiomi, K., Strong, K., Sweeney, C., Té, Y., Tian, H., Velazco, V. A., Vrekoussis, M., Warneke, T., Worden, J. R., Wunch, D., Yao, Y., Yun, J., Zammit-Mangion, A., and Zeng, N.: Pilot top-down CO₂ Budget constrained by the v10 OCO-2 MIP Version 1, Committee on Earth Observing Satellites, https://doi.org/10.48588/npf6-sw92, Version 1.0, 2022.
+            </p>
+        </div>
+
+        <div class="article">
+            <h2>Dataset Accuracy and Limitations</h2>
+            <p>
+                The uncertainty in the net carbon exchange (NCE) data is estimated based on the standard deviation of the v10 OCO-2 MIP ensemble members. This includes uncertainties originating from the transport model, inversion method, and prior constraints. However, the analysis is limited by the relatively small size of the ensemble (11 members) and the over-representation of inversions using the TM5 and GEOS-Chem transport models.
+            </p>
+            <p>
+                Furthermore, the ensemble-based uncertainty estimate does not capture some sources of uncertainty, such as Bayesian posterior uncertainties, which many participating inversion systems do not calculate. For more detailed information, please refer to Byrne et al., 2023.
+            </p>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <h3>Key Facts About the CO₂ Budget Dataset</h3>
+        <ul>
+            <li>Spatial Resolution: 1° x 1°</li>
+            <li>Temporal Resolution: Annual (2015-2020)</li>
+            <li>Inverse modeling used to estimate net carbon emissions</li>
+            <li>Includes lateral fluxes from crop trade, river export, and wood trade</li>
+            <li>Supports global climate agreements like the Paris Agreement</li>
+        </ul>
+    </aside>
+</div>
+
+<footer>
+    <p>&copy; 2024 Climate Watch - All Rights Reserved</p>
+</footer>
+
+</body>
+</html>
